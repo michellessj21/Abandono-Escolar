@@ -19,8 +19,12 @@ except Exception as e:
 db = client ["abandono_escolar"]
 coleccion = db["predicciones"]
 # Cargar el modelo entrenado
-with open('servidor/modelo/modelo_abandono.pkl', 'rb') as f:
-    modelo = pickle.load(f)
+try:
+    with open('servidor/modelo/modelo_abandono.pkl', 'rb') as f:
+        modelo = pickle.load(f)
+except Exception as e:
+    print("❌ Error al cargar el modelo:", e)
+    modelo = None
 
 @app.route('/')
 def inicio():
