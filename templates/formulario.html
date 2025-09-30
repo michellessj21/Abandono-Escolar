@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Predicción de Abandono Escolar</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Predicción de Riesgo Escolar</h1>
+    <p>Anticipa el abandono escolar y toma decisiones informadas</p>
+  </header>
+
+  <img src="https://image.slidesharecdn.com/abandonoescolar-141030022757-conversion-gate02/95/abandono-escolar-1-638.jpg?cb=1414671307" alt="Estudiantes en clase" class="banner">
+
+  <div class="container">
+    <div style="text-align: center; margin-top: 30px;">
+  <a href="/historial" target="_blank" style="
+    background-color: #0288d1;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+  ">📂 Ver historial de predicciones</a>
+</div>
+<div style="text-align: center; margin-top: 15px;">
+  <a href="/exportar_excel" style="
+    background-color: #fbc02d;
+    color: black;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+  ">📥 Exportar historial a Excel</a>
+</div>
+    <form id="formulario">
+      <label>🎓 Edad del estudiante</label>
+      <input type="number" name="edad" placeholder="Ej. 15" required>
+
+      <label>📊 Promedio general</label>
+      <input type="number" step="0.1" name="promedio" placeholder="Ej. 8.5" required>
+
+      <label>📅 Asistencia (%)</label>
+      <input type="number" name="asistencia" placeholder="Ej. 92" required>
+
+      <label>❌ Materias reprobadas</label>
+      <input type="number" name="reprobadas" placeholder="Ej. 2" required>
+
+      <label>🏠 Nivel socioeconómico</label>
+      <select name="socioeconomico" required>
+        <option value="">Selecciona una opción</option>
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
+      </select>
+
+      <button type="submit">Predecir riesgo</button>
+    </form>
+
+    <div id="resultado"></div>
+  </div>
+
+  <footer>
+    🌟 Cada estudiante merece una oportunidad. ¡Actuemos a tiempo!
+  </footer>
+
+  <script>
+    document.getElementById('formulario').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const datos = Object.fromEntries(new FormData(this));
+      const res = await fetch('/predecir', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+      });
+      const json = await res.json();
+      const resultado = document.getElementById('resultado');
+      if (json.riesgo_abandono === 'alto') {
+        resultado.style.backgroundColor = '#ffebee';
+        resultado.style.color = '#c62828';
+        resultado.innerHTML = '⚠️ <strong>Riesgo alto de abandono</strong>';
+      } else {
+        resultado.style.backgroundColor = '#e8f5e9';
+        resultado.style.color = '#2e7d32';
+        resultado.innerHTML = '✅ <strong>Riesgo bajo de abandono</strong>';
+      }
+    });
+  </script>
+</body>
+</html>

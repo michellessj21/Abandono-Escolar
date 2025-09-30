@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historial de Predicciones</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+  <header>
+    <h1>📂 Historial de Predicciones</h1>
+    <p>Visualiza los registros y analiza el riesgo escolar</p>
+  </header>
+
+  <div class="container">
+    <canvas id="graficaRiesgo" width="400" height="200"></canvas>
+
+    <table style="width:100%; margin-top: 30px; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color:#81c784; color:white;">
+          <th>Edad</th>
+          <th>Promedio</th>
+          <th>Asistencia</th>
+          <th>Reprobadas</th>
+          <th>Socioeconómico</th>
+          <th>Riesgo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr style="text-align:center;">
+          <td>{{ r.edad }}</td>
+          <td>{{ r.promedio }}</td>
+          <td>{{ r.asistencia }}%</td>
+          <td>{{ r.reprobadas }}</td>
+          <td>{{ r.socioeconomico }}</td>
+          <td style="color: {{ 'red' if r.riesgo_abandono == 'alto' else 'green' }};">
+            {{ r.riesgo_abandono }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const datos = {
+      alto: {{ registros | selectattr("riesgo_abandono", "equalto", "alto") | list | length }},
+      bajo: {{ registros | selectattr("riesgo_abandono", "equalto", "bajo") | list | length }}
+    };
+
+    const ctx = document.getElementById('graficaRiesgo').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Riesgo Alto', 'Riesgo Bajo'],
+        datasets: [{
+          data: [datos.alto, datos.bajo],
+          backgroundColor: ['#e53935', '#43a047']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Distribución de Riesgo Escolar'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
