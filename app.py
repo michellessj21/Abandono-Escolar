@@ -76,9 +76,14 @@ def historial():
 
 from io import BytesIO
 
+from io import BytesIO
+
 @app.route('/exportar_excel')
 def exportar_excel():
     registros = list(coleccion.find({}, {'_id': 0}))
+    if not registros:
+        return jsonify({'error': 'No hay datos para exportar'}), 404
+
     df = pd.DataFrame(registros)
 
     # Crear archivo Excel en memoria
@@ -91,8 +96,12 @@ def exportar_excel():
     fecha_actual = datetime.now().strftime('%y-%m-%d')
     nombre_archivo = f'historial_abandono_{fecha_actual}.xlsx'
 
-    return send_file(output, download_name=nombre_archivo, as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
+    return send_file(
+        output,
+        download_name=nombre_archivo,
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
