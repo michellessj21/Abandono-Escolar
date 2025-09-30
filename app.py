@@ -83,5 +83,5 @@ def exportar_excel():
     return send_file(nombre_archivo, as_attachment=True)
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5050)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=10000)
