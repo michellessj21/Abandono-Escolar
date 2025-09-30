@@ -75,11 +75,6 @@ def historial():
     return render_template('historial.html', registros=registros)
 
 from io import BytesIO
-
-from io import BytesIO
-
-from io import BytesIO
-
 import traceback
 
 @app.route('/exportar_excel')
@@ -101,7 +96,7 @@ def exportar_excel():
 
         return send_file(
             output,
-            download_name=nombre_archivo,
+            attachment_filename=nombre_archivo,
             as_attachment=True,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
