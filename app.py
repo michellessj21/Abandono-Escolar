@@ -74,19 +74,24 @@ def historial():
     registros = list(coleccion.find({}, {'_id': 0}))
     return render_template('historial.html', registros=registros)
 
+from io import BytesIO
+
 @app.route('/exportar_excel')
 def exportar_excel():
     registros = list(coleccion.find({}, {'_id': 0}))
     df = pd.DataFrame(registros)
 
-    # Obtener fecha actual en formato YYYY-MM-DD
-    fecha_actual = datetime.now().strftime('%Y-%m-%d')
+    # Crear archivo Excel en memoria
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Historial')
+    output.seek(0)
+
+    # Nombre del archivo con fecha
+    fecha_actual = datetime.now().strftime('%y-%m-%d')
     nombre_archivo = f'historial_abandono_{fecha_actual}.xlsx'
 
-    # Guardar archivo Excel con fecha
-    df.to_excel(nombre_archivo, index=False)
-
-    return send_file(nombre_archivo, as_attachment=True)
+    return send_file(output, download_name=nombre_archivo, as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 if __name__ == "__main__":
