@@ -78,30 +78,36 @@ from io import BytesIO
 
 from io import BytesIO
 
+from io import BytesIO
+
+import traceback
+
 @app.route('/exportar_excel')
 def exportar_excel():
-    registros = list(coleccion.find({}, {'_id': 0}))
-    if not registros:
-        return jsonify({'error': 'No hay datos para exportar'}), 404
+    try:
+        registros = list(coleccion.find({}, {'_id': 0}))
+        if not registros:
+            return jsonify({'error': 'No hay datos para exportar'}), 404
 
-    df = pd.DataFrame(registros)
+        df = pd.DataFrame(registros)
 
-    # Crear archivo Excel en memoria
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, sheet_name='Historial')
-    output.seek(0)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Historial')
+        output.seek(0)
 
-    # Nombre del archivo con fecha
-    fecha_actual = datetime.now().strftime('%y-%m-%d')
-    nombre_archivo = f'historial_abandono_{fecha_actual}.xlsx'
+        fecha_actual = datetime.now().strftime('%y-%m-%d')
+        nombre_archivo = f'historial_abandono_{fecha_actual}.xlsx'
 
-    return send_file(
-        output,
-        download_name=nombre_archivo,
-        as_attachment=True,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-
+        return send_file(
+            output,
+            download_name=nombre_archivo,
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except Exception as e:
+        print("❌ Error al exportar Excel:", e)
+        traceback.print_exc()
+        return jsonify({'error': 'Error interno al generar el archivo'}), 500
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
