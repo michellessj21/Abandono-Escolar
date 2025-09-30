@@ -35,6 +35,8 @@ def inicio():
 def predecir():
     datos = request.json
 
+    if modelo is None:
+     return jsonify({'error': 'Modelo no disponible'}), 500
     # Extraer variables
     edad = datos.get('edad')
     promedio = datos.get('promedio')
